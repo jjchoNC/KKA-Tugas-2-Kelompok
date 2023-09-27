@@ -265,9 +265,9 @@ int main()
     g.add_edge(1, 4, 9);
     vector<pair<vector<long>, long>> ucs_result;
     vector<vector<long>> bfs_result, dfs_result;
+    puts("UCS");
     g.ucs(ucs_result, 3, 1);
     g.resetExpand();
-    puts("UCS");
     for (auto it : ucs_result)
     {
         cout << "Expands : ";
