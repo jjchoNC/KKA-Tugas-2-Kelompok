@@ -6,6 +6,9 @@ struct graph
     long vertexCount, edgeCount;
     vector<vector<pair<long, long>>> adjList;
     vector<bool> expands;
+    long costBFS = 0;
+    long costDFS = 0;
+    long costUCS = 0;
     void init(long v)
     {
         vertexCount = v;
@@ -56,6 +59,8 @@ struct graph
                     }
                 }
                 puts("");
+                cout << "Total Cost : " << tempCost << endl;
+                puts("----------------------------------");
                 return;
             }
 
@@ -108,9 +113,20 @@ struct graph
                     {
                         cout << " -> ";
                     }
+                    for (auto j : adjList[start])
+                    {
+                        if (j.first == i)
+                        {
+                            costDFS += j.second;
+                            break;
+                        }
+                    }
+                    start = i;
                 }
                 puts("");
                 result.push_back(tempPath);
+                cout << "Total Cost : " << costDFS << endl;
+                puts("----------------------------------");
                 return;
             }
             if (!visited[temp])
@@ -163,8 +179,21 @@ struct graph
                             {
                                 cout << " -> ";
                             }
+                            if (start == i)
+                                continue;
+                            for (auto j : adjList[start])
+                            {
+                                if (j.first == i)
+                                {
+                                    costBFS += j.second;
+                                    break;
+                                }
+                            }
+                            start = i;
                         }
-                        cout << endl;
+                        puts("");
+                        cout << "Total Cost : " << costBFS << endl;
+                        puts("----------------------------------");
                     }
                     q.push(newPath);
                     visited[vertex.first] = true;
@@ -191,7 +220,7 @@ struct graph
             {
                 if (!expands[i.first])
                 {
-                    cout << "Child : " << i.first << " [Cost : " << cp + i.second << "]" <<  endl;
+                    cout << "Child : " << i.first << " [Total Cost : " << cp + i.second << "]" << endl;
                 }
                 else
                 {
