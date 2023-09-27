@@ -220,7 +220,7 @@ struct graph
             {
                 if (!expands[i.first])
                 {
-                    cout << "Child : " << i.first << " [Total Cost : " << cp + i.second << "]" << endl;
+                    cout << "Child : " << i.first << " [Cost : " << cp + i.second << "]" << endl;
                 }
                 else
                 {
