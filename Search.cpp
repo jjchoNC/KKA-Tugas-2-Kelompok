@@ -24,7 +24,7 @@ struct graph
         edgeCount++;
     }
 
-    void ucs(vector<vector<long>> &result, long start, long finish)
+    void ucs(vector<pair<vector<long>, long>> &result, long start, long finish)
     {
         vector<bool> visited(adjList.size(), false);
         vector<long> intialPath;
@@ -45,12 +45,12 @@ struct graph
             // cout << start << "->" << temp << ":" << tempCost << endl;
             urut.pop();
             if (temp == finish)
-            {   
-                result.push_back(tempPath);
+            {
+                result.push_back(make_pair(tempPath, tempCost));
                 for (auto i : tempPath)
                 {
                     cout << i;
-                    if(i != tempPath.back())
+                    if (i != tempPath.back())
                     {
                         cout << " -> ";
                     }
@@ -62,7 +62,7 @@ struct graph
             if (!visited[temp])
             {
                 visited[temp] = true;
-                result.push_back(tempPath);
+                result.push_back(make_pair(tempPath, tempCost));
             }
 
             for (auto vertex : adjList[temp])
@@ -174,7 +174,7 @@ struct graph
         }
     }
 
-    void printChild(string mode, long parent, long start)
+    void printChild(string mode, long parent, long start, long cp)
     {
         if (mode == "DFS")
         {
@@ -184,6 +184,24 @@ struct graph
                      { return a.first > b.first; });
             }
         }
+
+        else if (mode == "UCS")
+        {
+            for (auto i : adjList[start])
+            {
+                if (!expands[i.first])
+                {
+                    cout << "Child : " << i.first << " [Cost : " << cp + i.second << "]" <<  endl;
+                }
+                else
+                {
+                    cout << "Child : " << i.first << "[Expanded]" << endl;
+                }
+                expands[parent] = true;
+            }
+            return;
+        }
+
         for (auto i : adjList[start])
         {
             if (!expands[i.first])
@@ -216,24 +234,25 @@ int main()
     g.add_edge(4, 5, 3);
     g.add_edge(1, 5, 5);
     g.add_edge(1, 4, 9);
-    vector<vector<long>> bfs_result, dfs_result, ucs_result;
+    vector<pair<vector<long>, long>> ucs_result;
+    vector<vector<long>> bfs_result, dfs_result;
     g.ucs(ucs_result, 3, 1);
     g.resetExpand();
     puts("UCS");
     for (auto it : ucs_result)
     {
         cout << "Expands : ";
-        for (auto at : it)
+        for (auto at : it.first)
         {
             cout << at;
-            if (at != it.back())
+            if (at != it.first.back())
             {
                 cout << " -> ";
             }
             else
             {
                 puts("");
-                g.printChild("UCS", it.back(), at);
+                g.printChild("UCS", it.first.back(), at, it.second);
             }
         }
         puts("");
@@ -256,7 +275,7 @@ int main()
             else
             {
                 puts("");
-                g.printChild("DFS", it.back(), at);
+                g.printChild("DFS", it.back(), at, 0);
             }
         }
         puts("");
@@ -279,7 +298,7 @@ int main()
             else
             {
                 puts("");
-                g.printChild("BFS", it.back(), at);
+                g.printChild("BFS", it.back(), at, 0);
             }
         }
         puts("");
