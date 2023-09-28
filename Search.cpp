@@ -5,10 +5,13 @@ struct graph
 {
     long vertexCount, edgeCount;
     vector<vector<pair<long, long>>> adjList;
+    map<long, long> heuristic;
+    map<pair<long, long>, long> tempWeight;
     vector<bool> expands;
     long costBFS = 0;
     long costDFS = 0;
     long costUCS = 0;
+    long costGBFS = 0;
     void init(long v)
     {
         vertexCount = v;
@@ -20,11 +23,75 @@ struct graph
             adjList.push_back({});
         }
     }
+
+    void add_heuristic(long vertex, long h)
+    {
+        heuristic[vertex] = h;
+    }
+
     void add_edge(long vertex1, long vertex2, long weight)
     {
+        tempWeight[make_pair(vertex1, vertex2)] = weight;
+        tempWeight[make_pair(vertex2, vertex1)] = weight;
         adjList[vertex1].push_back(make_pair(vertex2, weight));
         adjList[vertex2].push_back(make_pair(vertex1, weight));
         edgeCount++;
+    }
+
+    void greedyBestFirstSearch(vector<vector<long>> &result, long start, long finish)
+    {
+        vector<bool> visited(adjList.size(), false);
+        vector<long> intialPath;
+        intialPath.push_back(start);
+        priority_queue<pair<pair<long, vector<long>>, pair<long, long>>, vector<pair<pair<long, vector<long>>, pair<long, long>>>, greater<pair<pair<long, vector<long>>, pair<long, long>>>> urut;
+        urut.push(make_pair(make_pair(0, intialPath), make_pair(INT_MAX, start)));
+
+        while (!urut.empty())
+        {
+            vector<long> tempPath = urut.top().first.second;
+            long temp = urut.top().second.second;
+            long tempCost = urut.top().first.first;
+            // cout << temp << " " << tempCost << endl;
+            urut.pop();
+            if (temp == finish)
+            {
+                long countTemp = start;
+                result.push_back(tempPath);
+                for (auto i : tempPath)
+                {
+                    costGBFS += tempWeight[make_pair(countTemp, i)];
+                    cout << i;
+                    if (i != tempPath.back())
+                    {
+                        cout << " -> ";
+                    }
+                    if (i == start)
+                        continue;
+                    countTemp = i;
+                }
+                puts("");
+                cout << "Total Cost : " << costGBFS << endl;
+                puts("----------------------------------");
+                return;
+            }
+
+            if (!visited[temp])
+            {
+                visited[temp] = true;
+                result.push_back(tempPath);
+            }
+
+            for (auto vertex : adjList[temp])
+            {
+                vector<long> newPath = tempPath;
+                newPath.push_back(vertex.first);
+                long neighbor = vertex.first;
+                if (!visited[neighbor])
+                {
+                    urut.push(make_pair(make_pair(heuristic[neighbor], newPath), make_pair(temp, neighbor)));
+                }
+            }
+        }
     }
 
     void ucs(vector<pair<vector<long>, long>> &result, long start, long finish)
@@ -49,6 +116,7 @@ struct graph
             urut.pop();
             if (temp == finish)
             {
+                costUCS = tempCost;
                 result.push_back(make_pair(tempPath, tempCost));
                 for (auto i : tempPath)
                 {
@@ -59,7 +127,7 @@ struct graph
                     }
                 }
                 puts("");
-                cout << "Total Cost : " << tempCost << endl;
+                cout << "Total Cost : " << costUCS << endl;
                 puts("----------------------------------");
                 return;
             }
@@ -218,13 +286,13 @@ struct graph
         {
             for (auto i : adjList[start])
             {
-                if (!expands[i.first])
+                if (!expands[i.first] && mode == "UCS")
                 {
                     cout << "Child : " << i.first << " [Cost : " << cp + i.second << "]" << endl;
                 }
                 else
                 {
-                    cout << "Child : " << i.first << "[Expanded]" << endl;
+                    cout << "Child : " << i.first << " [Expanded]" << endl;
                 }
                 expands[parent] = true;
             }
@@ -233,13 +301,17 @@ struct graph
 
         for (auto i : adjList[start])
         {
-            if (!expands[i.first])
+            if (!expands[i.first] && mode == "gBFS")
+            {
+                cout << "Child : " << i.first << " [Cost : " << heuristic[i.first] << "]" << endl;
+            }
+            else if (!expands[i.first])
             {
                 cout << "Child : " << i.first << endl;
             }
             else
             {
-                cout << "Child : " << i.first << "[Expanded]" << endl;
+                cout << "Child : " << i.first << " [Expanded]" << endl;
             }
             expands[parent] = true;
         }
@@ -263,8 +335,38 @@ int main()
     g.add_edge(4, 5, 3);
     g.add_edge(1, 5, 5);
     g.add_edge(1, 4, 9);
+    g.add_heuristic(0, 6);
+    g.add_heuristic(1, 0);
+    g.add_heuristic(2, 10);
+    g.add_heuristic(3, 9);
+    g.add_heuristic(4, 9);
+    g.add_heuristic(5, 4);
     vector<pair<vector<long>, long>> ucs_result;
-    vector<vector<long>> bfs_result, dfs_result;
+    vector<vector<long>> bfs_result, dfs_result, gBFS_result;
+
+    puts("Greedy BFS");
+    g.greedyBestFirstSearch(gBFS_result, 3, 1);
+    g.resetExpand();
+    for (auto it : gBFS_result)
+    {
+        cout << "Expands : ";
+        for (auto at : it)
+        {
+            cout << at;
+            if (at != it.back())
+            {
+                cout << " -> ";
+            }
+            else
+            {
+                puts("");
+                g.printChild("gBFS", it.back(), at, 0);
+            }
+        }
+        puts("");
+    }
+    puts("");
+
     puts("UCS");
     g.ucs(ucs_result, 3, 1);
     g.resetExpand();
