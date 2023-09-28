@@ -12,6 +12,7 @@ struct graph
     long costDFS = 0;
     long costUCS = 0;
     long costGBFS = 0;
+    long costASTAR = 0;
     void init(long v)
     {
         vertexCount = v;
@@ -54,18 +55,22 @@ struct graph
             urut.pop();
             if (temp == finish)
             {
-                costUCS = tempCost;
+                long countTemp = start;
                 result.push_back(make_pair(tempPath, tempCost));
                 for (auto i : tempPath)
                 {
+                    costASTAR += tempWeight[make_pair(countTemp, i)];
                     cout << i;
                     if (i != tempPath.back())
                     {
                         cout << " -> ";
                     }
+                    if (i == start)
+                        continue;
+                    countTemp = i;
                 }
                 puts("");
-                cout << "Total Cost : " << costUCS << endl;
+                cout << "Total Cost : " << costASTAR << endl;
                 puts("----------------------------------");
                 return;
             }
