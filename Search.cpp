@@ -38,6 +38,61 @@ struct graph
         edgeCount++;
     }
 
+    void aStar(vector<pair<vector<long>, long>> &result, long start, long finish)
+    {
+        vector<bool> visited(adjList.size(), false);
+        vector<long> intialPath;
+        intialPath.push_back(start);
+        priority_queue<pair<pair<long, vector<long>>, pair<long, long>>, vector<pair<pair<long, vector<long>>, pair<long, long>>>, greater<pair<pair<long, vector<long>>, pair<long, long>>>> urut;
+        urut.push(make_pair(make_pair(0, intialPath), make_pair(INT_MAX, start)));
+
+        while (!urut.empty())
+        {
+            vector<long> tempPath = urut.top().first.second;
+            long temp = urut.top().second.second;
+            long tempCost = urut.top().first.first;
+            urut.pop();
+            if (temp == finish)
+            {
+                costUCS = tempCost;
+                result.push_back(make_pair(tempPath, tempCost));
+                for (auto i : tempPath)
+                {
+                    cout << i;
+                    if (i != tempPath.back())
+                    {
+                        cout << " -> ";
+                    }
+                }
+                puts("");
+                cout << "Total Cost : " << costUCS << endl;
+                puts("----------------------------------");
+                return;
+            }
+            if (tempPath.size() != 1)
+            {
+                tempCost -= heuristic[tempPath.back()];
+            }
+            if (!visited[temp])
+            {
+                visited[temp] = true;
+                result.push_back(make_pair(tempPath, tempCost));
+            }
+
+            for (auto vertex : adjList[temp])
+            {
+                vector<long> newPath = tempPath;
+                newPath.push_back(vertex.first);
+                long neighbor = vertex.first;
+                long cost = vertex.second;
+                if (!visited[neighbor])
+                {
+                    urut.push(make_pair(make_pair((cost + tempCost + heuristic[neighbor]), newPath), make_pair(temp, neighbor)));
+                }
+            }
+        }
+    }
+
     void greedyBestFirstSearch(vector<vector<long>> &result, long start, long finish)
     {
         vector<bool> visited(adjList.size(), false);
@@ -105,11 +160,6 @@ struct graph
         while (!urut.empty())
         {
             vector<long> tempPath = urut.top().first.second;
-            for (auto &inner_vec : adjList)
-            {
-                sort(inner_vec.begin(), inner_vec.end(), [](const pair<long, long> &a, const pair<long, long> &b)
-                     { return a.first < b.first; });
-            }
             long tempCost = urut.top().first.first;
             long temp = urut.top().second.second;
             // cout << start << "->" << temp << ":" << tempCost << endl;
@@ -282,7 +332,7 @@ struct graph
             }
         }
 
-        else if (mode == "UCS")
+        else if (mode == "UCS" || mode == "aStar")
         {
             for (auto i : adjList[start])
             {
@@ -290,6 +340,11 @@ struct graph
                 {
                     cout << "Child : " << i.first << " [Cost : " << cp + i.second << "]" << endl;
                 }
+                else if (!expands[i.first] && mode == "aStar")
+                {
+                    cout << "Child : " << i.first << " [Cost : " << cp + i.second + heuristic[i.first] << "]" << endl;
+                }
+
                 else
                 {
                     cout << "Child : " << i.first << " [Expanded]" << endl;
@@ -341,8 +396,31 @@ int main()
     g.add_heuristic(3, 9);
     g.add_heuristic(4, 9);
     g.add_heuristic(5, 4);
-    vector<pair<vector<long>, long>> ucs_result;
+    vector<pair<vector<long>, long>> ucs_result, aStar_result;
     vector<vector<long>> bfs_result, dfs_result, gBFS_result;
+
+    puts("A*");
+    g.aStar(aStar_result, 3, 1);
+    g.resetExpand();
+    for (auto it : aStar_result)
+    {
+        cout << "Expands : ";
+        for (auto at : it.first)
+        {
+            cout << at;
+            if (at != it.first.back())
+            {
+                cout << " -> ";
+            }
+            else
+            {
+                puts("");
+                g.printChild("aStar", it.first.back(), at, it.second);
+            }
+        }
+        puts("");
+    }
+    puts("");
 
     puts("Greedy BFS");
     g.greedyBestFirstSearch(gBFS_result, 3, 1);
