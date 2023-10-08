@@ -521,3 +521,152 @@ int main()
 
     return 0;
 }
+
+/*
+A*
+3 -> 2 -> 0 -> 5 -> 1
+Total Cost : 11
+----------------------------------
+Expands : 3
+Child : 2 [Cost : 11]
+
+Expands : 3 -> 2
+Child : 3 [Expanded]
+Child : 4 [Cost : 13]
+Child : 0 [Cost : 9]
+
+Expands : 3 -> 2 -> 0
+Child : 2 [Expanded]
+Child : 5 [Cost : 10]
+Child : 4 [Cost : 16]
+
+Expands : 3 -> 2 -> 0 -> 5
+Child : 0 [Expanded]
+Child : 4 [Cost : 18]
+Child : 1 [Cost : 11]
+
+Expands : 3 -> 2 -> 0 -> 5 -> 1
+Child : 5 [Expanded]
+Child : 4 [Cost : 29]
+
+
+Greedy BFS
+3 -> 2 -> 0 -> 5 -> 1
+Total Cost : 11
+----------------------------------
+Expands : 3
+Child : 2 [Cost : 10]
+
+Expands : 3 -> 2
+Child : 3 [Expanded]
+Child : 4 [Cost : 9]
+Child : 0 [Cost : 6]
+
+Expands : 3 -> 2 -> 0
+Child : 2 [Expanded]
+Child : 5 [Cost : 4]
+Child : 4 [Cost : 9]
+
+Expands : 3 -> 2 -> 0 -> 5
+Child : 0 [Expanded]
+Child : 4 [Cost : 9]
+Child : 1 [Cost : 0]
+
+Expands : 3 -> 2 -> 0 -> 5 -> 1
+Child : 5 [Expanded]
+Child : 4 [Cost : 9]
+
+
+UCS
+3 -> 2 -> 0 -> 5 -> 1
+Total Cost : 11
+----------------------------------
+Expands : 3
+Child : 2 [Cost : 1]
+
+Expands : 3 -> 2
+Child : 3 [Expanded]
+Child : 4 [Cost : 4]
+Child : 0 [Cost : 3]
+
+Expands : 3 -> 2 -> 0
+Child : 2 [Expanded]
+Child : 5 [Cost : 6]
+Child : 4 [Cost : 7]
+
+Expands : 3 -> 2 -> 4
+Child : 2 [Expanded]
+Child : 0 [Expanded]
+Child : 5 [Cost : 7]
+Child : 1 [Cost : 13]
+
+Expands : 3 -> 2 -> 0 -> 5
+Child : 0 [Expanded]
+Child : 4 [Expanded]
+Child : 1 [Cost : 11]
+
+Expands : 3 -> 2 -> 0 -> 5 -> 1
+Child : 5 [Expanded]
+Child : 4 [Expanded]
+
+
+DFS
+3 -> 2 -> 4 -> 5 -> 1
+Total Cost : 12
+----------------------------------
+Expands : 3
+Child : 2
+
+Expands : 3 -> 2
+Child : 4
+Child : 3 [Expanded]
+Child : 0
+
+Expands : 3 -> 2 -> 4
+Child : 5
+Child : 2 [Expanded]
+Child : 1
+Child : 0
+
+Expands : 3 -> 2 -> 4 -> 5
+Child : 4 [Expanded]
+Child : 1
+Child : 0
+
+Expands : 3 -> 2 -> 4 -> 5 -> 1
+Child : 5 [Expanded]
+Child : 4 [Expanded]
+
+
+BFS
+3 -> 2 -> 4 -> 1
+Total Cost : 13
+----------------------------------
+Expands : 3
+Child : 2
+
+Expands : 3 -> 2
+Child : 0
+Child : 3 [Expanded]
+Child : 4
+
+Expands : 3 -> 2 -> 0
+Child : 2 [Expanded]
+Child : 4
+Child : 5
+
+Expands : 3 -> 2 -> 4
+Child : 0 [Expanded]
+Child : 1
+Child : 2 [Expanded]
+Child : 5
+
+Expands : 3 -> 2 -> 0 -> 5
+Child : 0 [Expanded]
+Child : 1
+Child : 4 [Expanded]
+
+Expands : 3 -> 2 -> 4 -> 1
+Child : 4 [Expanded]
+Child : 5 [Expanded]
+*/
